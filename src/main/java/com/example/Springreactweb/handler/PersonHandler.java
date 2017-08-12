@@ -7,6 +7,8 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
+import static org.springframework.web.reactive.function.BodyInserters.fromObject;
+
 /**
  * Created by amarendra on 12/08/17.
  */
@@ -26,15 +28,14 @@ public class PersonHandler {
     public Mono<ServerResponse> savePerson(ServerRequest request){
         Mono<Person> personMono = request.bodyToMono(Person.class);
         return ServerResponse.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(personRepository.findAll(), Person.class);
+                .build(personRepository.save(personMono));
     }
 
     public Mono<ServerResponse> getPerson(ServerRequest request){
         Integer id = Integer.valueOf(request.pathVariable("id"));
         Mono<Person> personMono = personRepository.findById(id);
         return personMono.flatMap(person -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
-                .syncBody(person))
+                .body(fromObject(person)))
                 .switchIfEmpty(ServerResponse.notFound().build());
     }
 }

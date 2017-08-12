@@ -33,6 +33,7 @@ public class PersonRepositoryImpl implements PersonRepository {
     public Mono<Void> save(Mono<Person> person) {
         return person.doOnNext( person1 -> {
             personMap.put(person1.getId(), person1);
+            System.out.println("Person -> "+ person1);
         }).thenEmpty(Mono.empty());
     }
 }
